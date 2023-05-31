@@ -1,0 +1,69 @@
+
+{% extends 'base.html' %}
+
+{% block body %}
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;"">
+    <a class="navbar-brand pl-3" href="/" style="font-size: 2rem;">POPメッセージ一覧</a>
+</nav>
+
+<div class="form">
+    <form action="/" method='POST'>
+        <div class="alert alert-warning" role="alert">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="title"> 
+                            対象製品は、<b>商品ID：{{pinfo.PID}}　／　価格：{{pinfo.Price}}円<br>商品説明：{{pinfo.Description}}</b>
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <image src="../images/{{pinfo.ImageFile}}" width="300" height="260"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- 何かエラーがあったとき -->
+{% if "ErrorMsg" in pinfo %}
+<div class="alert alert-danger" role="alert">
+    <label for="title">エラーが発生しました：{{pinfo.ErrorMsg}}</label>
+</div>
+{% elif "ReturnMsg" in pinfo %}
+<div class="alert alert-success" role="alert">
+    <label for="title">{{pinfo.ReturnMsg}}</label>
+</div>
+{% else %}
+<div class="card-body">
+    <div class="col-5 ml-3">
+        <table class="table table-responsive text-nowrap">
+
+            <thead>
+                <tr>
+                    <th>開始日</th>
+                    <th>期間</th>
+                    <th>内容</th>
+                    <th>ステータス</th>
+                    <th>却下理由</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for pop in pinfo.POP %}
+                <tr>
+                    <th>{{pop.StartDate}}</th>
+                    <td>{{pop.Period}} 日</td>
+                    <td>{{pop.Message}}</td>
+                    <td>{{pop.Status}}</td>
+                    <td>{{pop.RejectedReason}}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,17 @@
+//日本語ロケールに変更
+set $namespace="%SYS"
+// アプリ用設定コードロード
+do $system.OBJ.Load("/opt/try/Setup.cls", "ck")
+do ##class(ZWF.Setup).init()
+
+// アプリ用コードロード
+set $namespace="USER"
+do $system.OBJ.LoadDir("/opt/try/ISJFoods","ck",,1)
+//プロダクション自動開始設定
+do ##class(Ens.Director).SetAutoStart("ISJFoods.Production")
+//ワークフローユーザとロールの作成
+do ##class(ISJFoods.Utils).CreateWFUserAndRole()
+//アプリ用データ初期実行
+do ##class(ISJFoods.Utils).CreateData()
+
+halt

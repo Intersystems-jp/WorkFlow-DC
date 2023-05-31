@@ -1,0 +1,164 @@
+
+{% extends 'base.html' %}
+
+{% block body %}
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;"">
+    <a class="navbar-brand pl-3" href="/" style="font-size: 2rem;">POPメッセージ審査画面</a>
+</nav>
+
+
+<script type="text/javascript">
+function taskpost(input) {
+    var url="http://localhost:5001/task/"+document.getElementById("taskid").value;
+    //alert(url);
+    //alert(input.value);
+    rejectedreason=document.getElementById("RejectedReason").value;
+    //alert(rejectedreason);
+    $.ajax({
+        url: url,
+        type: "post",
+        data:{action:input.value,formFields:{RejectedReason:rejectedreason}},
+    }).done(function(retjson) {
+        console.log(retjson)
+        window.location.reload(true);
+    }).fail(function() {
+        console.log("失敗::"+retjson);
+    });
+};
+
+function dispinfo(input) {
+    var url="http://localhost:5001/task/"+input.id
+    console.log(url)
+    $.ajax({
+        url: url,
+        type: "get",
+    }).done(function(retjson) {           // 戻って来るのは文字（JSON文字）
+        console.log(retjson);
+        var json = JSON.parse(retjson); 
+        
+        pinfo=document.getElementById('pinfo');
+        pinfo.innerHTML="<b>対象製品は、商品ID："+ json.pinfo.PID +"　／　価格："+ json.pinfo.Price+" 円<br>商品説明："+json.pinfo.Description+"</b>";
+        
+        img=document.getElementById('pimage');
+        img.src="images/"+json.pinfo.ImageFile;
+
+        //タスク詳細情報
+        document.getElementById("taskid").value=json.taskinfo.id;
+        document.getElementById("popid").innerHTML=json.taskinfo.formFields.POPID;
+        document.getElementById("taskmsg").innerHTML=json.taskinfo.message;
+        document.getElementById("tasktime").innerHTML=json.taskinfo.timeCreated;
+        document.getElementById("taskstartdate").innerHTML=json.pinfo.StartDate;
+        document.getElementById("taskperiod").innerHTML=json.pinfo.Period;
+        document.getElementById("RejectedReason").value="";
+
+        var taskinfo=document.getElementById("taskinfo")
+        if (taskinfo.style.display=="none") {
+            //blockで表示
+            taskinfo.style.display="block";
+        }
+
+    }).fail(function() {
+        console.log("失敗");
+    });
+};
+</script>
+
+<!-- 何かエラーがあったとき -->
+{% if "ErrorMsg" in wfinfo %}
+<div class="alert alert-danger" role="alert">
+    <label for="title">エラーが発生しました：{{wfinfo.ErrorMsg}}</label>
+</div>
+{% elif "ReturnMsg" in wfinfo %}
+<div class="alert alert-success" role="alert">
+    <label for="title">{{wfinfo.ReturnMsg}}</label>
+</div>
+
+{% else %}
+<form method="get" action="/">
+<div class="alert alert-warning" role="alert">
+    <div class="row">
+    <div class="col-5 ml-3">
+        <table class="table table-responsive text-nowrap">
+
+            <thead>
+                <tr>
+                    <th>件名</th>
+                    <th>メッセージ候補</th>
+                    <th>送信時刻</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for list in wfinfo %}
+                <tr>
+                    <th>{{list.subject}}</th>
+                    <td>{{list.message}} </td>
+                    <td>{{list.timeCreated}}</td>
+                    <td><input type="button" class="btn btn-primary ButtonA" id="{{list.id}}" value="審査する" onclick="dispinfo(this)"></td>                    
+                    <!--
+                    <td><input type="button" class="ButtonA" id="judge" value="{{list.id}}" onclick="send_to_python(this)"></td>
+                    -->
+                </tr>
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+    </div>
+    </div>
+</div>
+
+
+<div id="taskinfo">
+    <div class="container">
+        <div class="row">
+            <label for="title" id="pinfo"> 
+                <!-- -->
+            </label>
+        </div>
+        <div class="col-md-6">
+            <image id="pimage" src="" width="300" height="260"/>
+        </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <table class="table table-responsive text-nowrap">
+                <thead>
+                    <tr>
+                        <th>POP ID</th>
+                        <th>POP候補メッセージ</th>
+                        <th>登録時刻</th>
+                        <th>開始日</th>
+                        <th>期間</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th id="popid"> </th>
+                        <td id="taskmsg"> </td>
+                        <td id="tasktime"> </td>
+                        <td id="taskstartdate"> </td>
+                        <td id="taskperiod"> </td>
+                    </tr>
+                </tbody>
+
+            </table>
+            <input type="hidden" id="taskid" name="taskid">
+            <textarea class="form-control" id="RejectedReason" name="RejectedReason" rows="3" placeholder="却下の場合は理由をご記入ください"></textarea>
+            <button name="actionbtn" class="btn btn-primary" value="承認" onclick="taskpost(this)">承認</button>
+            <button name="actionbtn" class="btn btn-secondary" value="却下" onclick="taskpost(this)">却下</button>
+            </div>
+            <div class="col-md-6">
+
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+<script>
+//初期表示
+document.getElementById("taskinfo").style.display="none";
+</script>
+{% endif %}
+{% endblock %}

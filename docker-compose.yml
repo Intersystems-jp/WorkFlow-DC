@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  iriswf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports: ["9092:1972","9093:52773","5001:5000"]
+    container_name: iriswf
+    volumes: ["./Flask:/Flask","./file:/file"]
+    environment: 
+      - TZ=JST-9
