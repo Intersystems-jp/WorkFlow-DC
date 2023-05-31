@@ -125,7 +125,7 @@ IRISの管理ポータル、プロダクション構成画面は以下URLでア�
 ![](/assets/BPL.png)
 
 
-#### 2-6. メモ
+#### 2-5. メモ
 
 もう1度、同じデータを利用してワークフローユーザポータル上で審査したい場合は、[IRIS管理ポータル SQLメニュー](http://localhost:9093/csp/sys/exp/%25CSP.UI.Portal.SQL.Home.zen?$NAMESPACE=USER&$NAMESPACE=USER)の「クエリ実行」タブで、以下UPDATE文を実行してください。
 
