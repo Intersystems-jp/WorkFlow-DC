@@ -26,26 +26,3 @@ def getProductInfo(pid):
     jmoji=iris.ref("jmoji")
     obj._JSONExportToString(jmoji)
     return jmoji.value
-
-#失敗したらエラー文字列作って戻す
-def callBS(jsontext):
-    #メッセージ用意
-    msg=iris.cls("Ens.StringRequest")._New(jsontext)
-
-    #参照渡しの変数用意
-    #bs=iris.ref('bs')
-    response=iris.ref('response')
-    #サービスのインスタンス作成
-    bs=iris.cls("ProductPlan.BS.CurationAndJudgmentService")._New("新商品審査サービス")
-
-    #サービス呼び出し
-    retval=iris.ref("retval")
-    #第2引数はインスタンス指定なので参照渡しができない。第3引数が文字列の参照渡しなので使ってみる
-    status=bs.ProcessInput(msg,response,retval)
-    #エラーの場合エラーステータスを取得しJSON文字にして返送（ErrorMsgプロパティに情報設定）
-    if iris.system.Status.IsError(status):
-        returnmsg={"ErrorMsg":iris.system.Status.GetErrorText(status)}
-        return json.dumps(returnmsg,ensure_ascii=False)
-
-    #JSON文字列を返す
-    return retval.value
